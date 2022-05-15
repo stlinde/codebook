@@ -52,7 +52,49 @@ class CreditCard:
         """Process customer payment that reduces balance."""
         self._balance -= amount
 
-cc = CreditCard("John Doe", "1st Bank", "5391 0375 9387 5309", 1000)
+
+# Creating a subclass for PredatoryCreditCard, see ch. 2.4
+
+class PredatoryCreditCard(CreditCard):
+    """An extension to CreditCard that compounds interests and fees."""
+    def __init__(self,
+                 customer: str,
+                 bank: str,
+                 acnt: str,
+                 limit: int,
+                 apr: float):
+        """Create a new predatory credit card instance.
+
+        The initial balance is zero.
+
+        customer    the name of the customer.
+        bank        the name of the bank.
+        acnt        the account identifier.
+        limit       credit limit
+        apr         annual percentage rate
+        """
+        super().__init__(customer, bank, acnt, limit)
+        self._apr = apr
+
+    def charge(self, price: int):
+        """Charge given price to the card, assuming sufficient credit limit.
+
+        Return True if charge was processed.
+        Return False and assess $5 fee if charge is denied.
+        """
+        success = super().charge(price)
+        if not success:
+            self._balance += 5
+        return success
+
+    def process_month(self):
+        """Assess monthly interest on outstanding balance."""
+        if self._balance > 0:
+            # If positive balance, convert APR to monthly multiplicative factor
+            monthly_factor = pow(1 + self._apr, 1/12) 
+            self._balance *= monthly_factor
+
+        
 
 # Testing the class
 # These tests provide method coverage.
